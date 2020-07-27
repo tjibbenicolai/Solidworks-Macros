@@ -1,0 +1,42 @@
+Dim swApp           As SldWorks.SldWorks
+Dim swModel         As SldWorks.ModelDoc2
+Dim swDraw          As SldWorks.DrawingDoc
+Dim fileName        As String
+Dim filePath        As String
+
+Sub main()
+
+Set swApp = Application.SldWorks
+Set swModel = swApp.ActiveDoc
+
+If swModel Is Nothing Then
+MsgBox "Please open a file."
+Exit Sub
+End If
+If swModel.GetType <> swDocDRAWING Then
+MsgBox "Please use this macro only for drawings."
+Exit Sub
+End If
+
+'save to folder of original file
+'filePath = Left(swModel.GetPathName, InStrRev(swModel.GetPathName, "\") - 1) & "\"
+
+'save to desktop -> change [USER NAME] to your own Microsoft User name
+filePath = "C:\Users\[USER NAME]\Desktop\Temp" & "\"
+
+'New style files 2020 with PDM nr = filename
+fileName = GetFilename(swModel.GetPathName) & "-" & swModel.CustomInfo2("", "Revision") & " - " & swModel.CustomInfo2("", "Description") & ".pdf"
+
+'old style files
+'fileName = swModel.CustomInfo2("", "SW PDM Number") & "-" & swModel.CustomInfo2("", "Revision") & " " & GetFilename(swModel.GetPathName) & ".pdf"
+
+swModel.SaveAs filePath & fileName
+'MsgBox "File saved to " & filePath & fileName
+
+End Sub
+
+Function GetFilename(strPath As String) As String
+    Dim strTemp As String
+    strTemp = Mid$(strPath, InStrRev(strPath, "\") + 1)
+    GetFilename = Left$(strTemp, InStrRev(strTemp, ".") - 1)
+End Function
